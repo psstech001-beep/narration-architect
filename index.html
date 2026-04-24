@@ -70,10 +70,6 @@
             color: #c7a982;
         }
 
-        .copy-success {
-            background-color: #10b981 !important;
-        }
-
         .narrative-connector {
             position: relative;
         }
@@ -92,7 +88,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center pb-20">
+<body class="min-h-screen flex flex-col items-center">
 
     <header class="w-full bg-[#1a1a19] text-[#fcfbf9] py-10 px-6 shadow-md">
         <div class="max-w-5xl mx-auto">
@@ -116,7 +112,7 @@
         </div>
     </header>
 
-    <main class="w-full max-w-5xl mx-auto px-6 py-12 grid grid-cols-1 gap-12">
+    <main class="w-full max-w-5xl mx-auto px-6 py-12 grid grid-cols-1 gap-12 flex-grow">
 
         <!-- SECTION 1: SMART INPUT & AUTHENTICITY -->
         <section class="w-full">
@@ -183,7 +179,7 @@
         </section>
 
         <!-- SECTION 3: GENERATED STORYBOARD -->
-        <section class="w-full" id="storyboard-section">
+        <section class="w-full pb-10" id="storyboard-section">
             <h2 class="text-3xl font-bold text-[#1a1a19] mb-8">Synchronized Storyboard</h2>
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-white border border-[#e6e4df] rounded-xl overflow-hidden shadow-sm min-h-[500px]">
                 <div class="lg:col-span-4 bg-[#fcfbf9] border-r border-[#e6e4df] p-6 flex flex-col gap-4" id="scene-selector"></div>
@@ -196,6 +192,34 @@
         </section>
 
     </main>
+
+    <!-- FOOTER SECTION -->
+    <footer class="w-full bg-[#1a1a19] border-t border-[#3a3a38] py-12 px-6 mt-12">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="text-center md:text-left">
+                <h3 class="text-[#c7a982] font-bold tracking-widest uppercase text-lg mb-1 text-center md:text-left">PSS Media Production</h3>
+                <p class="text-[#a8a8a4] text-xs font-light">Excellence in cinematic historical storytelling.</p>
+            </div>
+            
+            <div class="flex flex-col items-center">
+                <div class="flex gap-4 mb-3">
+                    <span class="w-1 h-1 rounded-full bg-[#8b1c1c]"></span>
+                    <span class="w-1 h-1 rounded-full bg-[#c7a982]"></span>
+                    <span class="w-1 h-1 rounded-full bg-[#8b1c1c]"></span>
+                </div>
+                <span class="text-[10px] text-[#fcfbf9] uppercase tracking-[0.4em] font-bold opacity-60">Studio Core</span>
+            </div>
+
+            <div class="text-center md:text-right">
+                <p class="text-[#a8a8a4] text-[10px] uppercase tracking-widest mb-2">&copy; 2026 PSS Media Production</p>
+                <div class="flex justify-center md:justify-end gap-4 text-[#fcfbf9] text-[9px] uppercase tracking-widest font-bold">
+                    <span class="hover:text-[#c7a982] cursor-pointer transition-colors">Privacy</span>
+                    <span class="text-[#3a3a38] px-1">|</span>
+                    <span class="hover:text-[#c7a982] cursor-pointer transition-colors">Terms</span>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script>
         let scriptData = [];
@@ -247,19 +271,11 @@
             `;
         }
 
-        /**
-         * Finer-grained text processing.
-         * Instead of aggressive compression, we divide the original text into 3 acts
-         * and only truncate if it vastly exceeds the reading speed.
-         */
         function highFidelitySegment(fullText, targetWords) {
-            // Split by sentence to keep facts intact
             let sentences = fullText.match(/[^\.!\?]+[\.!\?]+/g) || [fullText];
             let currentText = sentences.join(' ');
             let words = currentText.split(/\s+/).filter(w => w.length > 0);
             
-            // If words are slightly over (within 20%), keep it for natural pacing.
-            // If significantly over, we must trim to maintain the user's requested video duration.
             if (words.length > targetWords * 1.5) {
                 return words.slice(0, Math.floor(targetWords * 1.2)).join(' ') + "...";
             }
@@ -293,10 +309,9 @@
             }
             await new Promise(r => setTimeout(r, 600));
 
-            const totalWordsTarget = Math.floor(targetDuration * 2.8); // Slightly higher wpm for natural speech
+            const totalWordsTarget = Math.floor(targetDuration * 2.8);
             const segmentTarget = Math.floor(totalWordsTarget / 3);
 
-            // Split into 3 connected acts based on original text
             const allSentences = story.match(/[^\.!\?]+[\.!\?]+/g) || [story];
             const size = Math.ceil(allSentences.length / 3);
             
@@ -384,7 +399,7 @@
             container.innerHTML = '';
             scriptData.forEach((s, i) => {
                 const btn = document.createElement('button');
-                btn.className = `scene-card text-left p-4 rounded-xl border narrative-connector ${i === currentSceneIndex ? 'active bg-white' : 'border-transparent'}`;
+                btn.className = `scene-card text-left p-4 rounded-xl border narrative-connector ${i === currentSceneIndex ? 'active bg-white shadow-sm' : 'border-transparent'}`;
                 btn.onclick = () => { currentSceneIndex = i; renderSceneList(); renderSceneDetail(); };
                 btn.innerHTML = `<div class="text-[10px] font-bold text-[#8b1c1c]">${s.time}</div><div class="font-bold text-sm">${s.title}</div>`;
                 container.appendChild(btn);
