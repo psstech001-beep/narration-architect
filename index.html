@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Script Architect - Variable Duration Adapter</title>
+    <title>Script Architect - AI Video Ready</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -64,6 +64,10 @@
             color: white;
             border-color: #8b1c1c;
         }
+
+        .copy-success {
+            background-color: #10b981 !important;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center pb-20">
@@ -73,8 +77,8 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-[#3a3a38] pb-6 mb-6">
                 <div>
                     <span class="text-[#c7a982] uppercase tracking-widest text-sm font-bold mb-2 block">Narration Architect</span>
-                    <h1 class="text-4xl font-bold leading-tight">Script Story Adapter</h1>
-                    <p class="text-[#a8a8a4] mt-2 text-lg font-light">Custom timing for any story format.</p>
+                    <h1 class="text-4xl font-bold leading-tight">Script & AI Prompt Studio</h1>
+                    <p class="text-[#a8a8a4] mt-2 text-lg font-light">Custom timing and AI video prompts for any story.</p>
                 </div>
                 <div class="mt-6 md:mt-0 flex gap-4">
                     <div class="bg-[#2b2a27] px-4 py-3 rounded text-center border border-[#3a3a38]">
@@ -98,7 +102,7 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                     <div>
                         <h2 class="text-2xl font-bold text-[#1a1a19]">Input Your Story</h2>
-                        <p class="text-slate-500 text-sm italic">The script will be automatically scaled to your selected duration.</p>
+                        <p class="text-slate-500 text-sm italic">Script and AI prompts will be based directly on your narrative text.</p>
                     </div>
                     <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200" id="duration-selector">
                         <button onclick="setDuration(15)" class="duration-pill active px-4 py-2 rounded-md text-xs font-bold border border-transparent" data-val="15">15s</button>
@@ -111,7 +115,7 @@
                 
                 <div class="flex flex-col md:flex-row gap-4">
                     <button id="adapt-btn" onclick="adaptStory()" class="flex-1 py-4 bg-[#8b1c1c] text-white font-bold rounded-xl hover:bg-[#6b1616] transition-all shadow-lg shadow-red-900/10 active:scale-95 disabled:opacity-50">
-                        Generate & Time Script
+                        Generate Script & AI Prompts
                     </button>
                     <button onclick="clearInput()" class="px-6 py-4 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all">
                         Clear
@@ -132,8 +136,8 @@
 
             <div class="space-y-4">
                 <div class="bg-[#f4eee6] p-4 rounded-lg border border-[#e6e4df]">
-                    <h4 class="font-bold text-xs text-[#8b1c1c] uppercase tracking-widest mb-2">Architect's Strategy</h4>
-                    <p class="text-xs text-slate-700 leading-relaxed" id="strategy-note">Select a duration and input a story to begin.</p>
+                    <h4 class="font-bold text-xs text-[#8b1c1c] uppercase tracking-widest mb-2">Meta AI Strategy</h4>
+                    <p class="text-xs text-slate-700 leading-relaxed" id="strategy-note">Each visual prompt is now synthesized using the specific narration text to ensure visual alignment.</p>
                 </div>
                 <div class="bg-white p-4 rounded-lg border border-[#e6e4df]">
                     <h4 class="font-bold text-xs text-slate-500 uppercase tracking-widest mb-2">Timeline Segments</h4>
@@ -147,11 +151,11 @@
         <!-- SECTION 3: GENERATED STORYBOARD -->
         <section class="w-full" id="storyboard-section">
             <h2 class="text-3xl font-bold text-[#1a1a19] mb-8">Generated Storyboard</h2>
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-white border border-[#e6e4df] rounded-xl overflow-hidden shadow-sm min-h-[450px]">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-white border border-[#e6e4df] rounded-xl overflow-hidden shadow-sm min-h-[500px]">
                 <div class="lg:col-span-4 bg-[#fcfbf9] border-r border-[#e6e4df] p-6 flex flex-col gap-4" id="scene-selector"></div>
                 <div class="lg:col-span-8 p-8 md:p-12 flex flex-col justify-center">
                     <div id="scene-display" class="fade-in">
-                        <div class="text-center text-slate-300 italic">Generate a script to view the storyboard beats.</div>
+                        <div class="text-center text-slate-300 italic">Generate a script to view the storyboard beats and synced AI prompts.</div>
                     </div>
                 </div>
             </div>
@@ -184,11 +188,11 @@
             const container = document.getElementById('timeline-indicator');
             const segmentTime = targetDuration / 3;
             container.innerHTML = `
-                <div class="flex justify-between text-[10px]"><span>The Hook (0-${segmentTime}s)</span><span class="font-bold">${segmentTime}s</span></div>
+                <div class="flex justify-between text-[10px]"><span>Hook (0-${segmentTime}s)</span><span class="font-bold">${segmentTime}s</span></div>
                 <div class="w-full bg-slate-100 h-1 rounded-full overflow-hidden"><div class="bg-amber-500 h-full" style="width: 33%"></div></div>
-                <div class="flex justify-between text-[10px]"><span>The Core (${segmentTime}-${segmentTime*2}s)</span><span class="font-bold">${segmentTime}s</span></div>
+                <div class="flex justify-between text-[10px]"><span>Core (${segmentTime}-${segmentTime*2}s)</span><span class="font-bold">${segmentTime}s</span></div>
                 <div class="w-full bg-slate-100 h-1 rounded-full overflow-hidden"><div class="bg-red-500 h-full" style="width: 33%"></div></div>
-                <div class="flex justify-between text-[10px]"><span>The Impact (${segmentTime*2}-${targetDuration}s)</span><span class="font-bold">${segmentTime}s</span></div>
+                <div class="flex justify-between text-[10px]"><span>Impact (${segmentTime*2}-${targetDuration}s)</span><span class="font-bold">${segmentTime}s</span></div>
                 <div class="w-full bg-slate-100 h-1 rounded-full overflow-hidden"><div class="bg-slate-800 h-full" style="width: 34%"></div></div>
             `;
         }
@@ -207,15 +211,30 @@
             return `Dynamic ${type} shot establishing the atmosphere.`;
         }
 
+        /**
+         * Updated Meta AI Prompt Logic
+         * Directly uses the specific narration beat to drive the visual prompt.
+         */
+        function generateMetaAIPrompt(narrationText, visualType) {
+            const styleTokens = "photorealistic cinematic film, 8k resolution, highly detailed textures, dramatic lighting, epic atmosphere, professional color grading";
+            const cameraTokens = visualType === "wide" ? "wide angle cinematic sweep, epic scale" : 
+                               visualType === "medium" ? "medium shot, dynamic character movement" : 
+                               "extreme close-up, high emotional detail, shallow depth of field";
+            
+            // Clean text for prompt
+            const coreSubject = narrationText.replace(/[".!?,]/g, "").trim();
+            
+            return `[Meta AI Prompt]: A ${cameraTokens} visualizing: "${coreSubject}". ${styleTokens}, hyper-realistic, slow-motion movement, masterfully composed.`;
+        }
+
         async function adaptStory() {
             const btn = document.getElementById('adapt-btn');
             const story = document.getElementById('raw-story-input').value.trim() || defaultStory;
             
             btn.disabled = true;
-            btn.innerText = "Recalibrating Time...";
+            btn.innerText = "Analyzing Narrative...";
             await new Promise(r => setTimeout(r, 600));
 
-            // Logic: 2.6 words per second is a comfortable cinematic pace.
             const totalWordsTarget = Math.floor(targetDuration * 2.6);
             const segmentTarget = Math.floor(totalWordsTarget / 3);
 
@@ -228,17 +247,42 @@
 
             const segTime = targetDuration / 3;
 
+            const n1 = compress(p1, segmentTarget);
+            const n2 = compress(p2, segmentTarget);
+            const n3 = compress(p3, segmentTarget);
+
             scriptData = [
-                { id: 1, time: `0s - ${segTime}s`, title: "The Hook", narration: compress(p1, segmentTarget), visual: generateVisualCue(p1, "wide") },
-                { id: 2, time: `${segTime}s - ${segTime*2}s`, title: "The Tension", narration: compress(p2, segmentTarget), visual: generateVisualCue(p2, "medium") },
-                { id: 3, time: `${segTime*2}s - ${targetDuration}s`, title: "The Resolution", narration: compress(p3, segmentTarget), visual: generateVisualCue(p3, "close") }
+                { 
+                    id: 1, 
+                    time: `0s - ${segTime}s`, 
+                    title: "The Hook", 
+                    narration: n1, 
+                    visual: generateVisualCue(p1, "wide"),
+                    aiPrompt: generateMetaAIPrompt(n1, "wide")
+                },
+                { 
+                    id: 2, 
+                    time: `${segTime}s - ${segTime*2}s`, 
+                    title: "The Tension", 
+                    narration: n2, 
+                    visual: generateVisualCue(p2, "medium"),
+                    aiPrompt: generateMetaAIPrompt(n2, "medium")
+                },
+                { 
+                    id: 3, 
+                    time: `${segTime*2}s - ${targetDuration}s`, 
+                    title: "The Resolution", 
+                    narration: n3, 
+                    visual: generateVisualCue(p3, "close"),
+                    aiPrompt: generateMetaAIPrompt(n3, "close")
+                }
             ];
 
-            document.getElementById('strategy-note').innerText = `Adapted for ${targetDuration}s duration. Word count optimized to ${totalWordsTarget} for a natural speaking pace.`;
+            document.getElementById('strategy-note').innerText = `Visual prompts are now directly synced with the condensed narration text.`;
             document.getElementById('pacing-text').innerText = `Pacing: ~${segmentTarget} words per segment.`;
 
             btn.disabled = false;
-            btn.innerText = "Generate & Time Script";
+            btn.innerText = "Generate Script & AI Prompts";
 
             updateStats();
             updateChart();
@@ -286,6 +330,26 @@
             });
         }
 
+        function copyPrompt(id) {
+            const text = document.getElementById(id).innerText;
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            
+            const tempInput = document.createElement("textarea");
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            btn.innerHTML = "Copied!";
+            btn.classList.add('copy-success');
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('copy-success');
+            }, 2000);
+        }
+
         function renderSceneDetail() {
             const container = document.getElementById('scene-display');
             const scene = scriptData[currentSceneIndex];
@@ -296,14 +360,26 @@
             container.innerHTML = `
                 <div class="inline-block bg-[#1a1a19] text-white text-[10px] font-bold px-3 py-1 rounded uppercase tracking-widest mb-6">${scene.time}</div>
                 <h3 class="text-3xl font-bold text-[#1a1a19] mb-8 serif-text">${scene.title}</h3>
-                <div class="mb-10">
+                
+                <div class="mb-8">
                     <h4 class="text-xs font-bold text-[#8b8a86] uppercase tracking-widest mb-4">Narration</h4>
                     <p class="text-2xl leading-relaxed text-[#2b2a27] border-l-4 border-[#c7a982] pl-8 py-2 serif-text italic">"${scene.narration}"</p>
                 </div>
-                <div class="pt-8 border-t border-[#e6e4df] flex flex-col md:flex-row gap-8">
-                    <div class="flex-1">
-                        <h4 class="text-xs font-bold text-[#8b8a86] uppercase tracking-widest mb-3">Visual Direction</h4>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-8 border-t border-[#e6e4df]">
+                    <div>
+                        <h4 class="text-xs font-bold text-[#8b8a86] uppercase tracking-widest mb-3">Visual Cue</h4>
                         <p class="text-sm text-[#4a4946] leading-relaxed">${scene.visual}</p>
+                    </div>
+                    <div class="bg-[#fcfbf9] p-5 rounded-xl border border-slate-200 relative group">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="text-[10px] font-bold text-[#8b1c1c] uppercase tracking-widest">Meta AI Synced Prompt</h4>
+                            <button onclick="copyPrompt('ai-prompt-text')" class="text-[10px] bg-[#2b2a27] text-white px-2 py-1 rounded hover:bg-black transition-colors">
+                                Copy Prompt
+                            </button>
+                        </div>
+                        <p id="ai-prompt-text" class="text-[11px] text-slate-600 italic leading-relaxed select-all">"${scene.aiPrompt}"</p>
+                        <div class="mt-3 text-[9px] text-slate-400 font-medium italic">*Generated directly from narration beat</div>
                     </div>
                 </div>
             `;
@@ -313,7 +389,7 @@
             document.getElementById('raw-story-input').value = '';
             scriptData = [];
             document.getElementById('scene-selector').innerHTML = '';
-            document.getElementById('scene-display').innerHTML = '<div class="text-center text-slate-300 italic">Generate a script to view the storyboard beats.</div>';
+            document.getElementById('scene-display').innerHTML = '<div class="text-center text-slate-300 italic">Generate a script to view the storyboard beats and synced AI prompts.</div>';
             document.getElementById('stat-words').innerText = '0';
             if (chartInstance) chartInstance.destroy();
         }
