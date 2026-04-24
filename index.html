@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Script Architect - Variable Duration Adapter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Merriweather:ital,wght@0,300;0,700;1,300&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcfbf9;
+            color: #2b2a27;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, .serif-text {
+            font-family: 'Merriweather', serif;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 30vh;
+            max-height: 300px;
+        }
+
+        .scene-card {
+            transition: all 0.3s ease;
+        }
+
+        .scene-card.active {
+            border-left: 4px solid #8b1c1c;
+            background-color: #f4eee6;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-focus:focus {
+            outline: none;
+            border-color: #8b1c1c;
+            box-shadow: 0 0 0 2px rgba(139, 28, 28, 0.1);
+        }
+
+        .duration-pill {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .duration-pill.active {
+            background-color: #8b1c1c;
+            color: white;
+            border-color: #8b1c1c;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center pb-20">
+
+    <header class="w-full bg-[#1a1a19] text-[#fcfbf9] py-10 px-6 shadow-md">
+        <div class="max-w-5xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-[#3a3a38] pb-6 mb-6">
+                <div>
+                    <span class="text-[#c7a982] uppercase tracking-widest text-sm font-bold mb-2 block">Narration Architect</span>
+                    <h1 class="text-4xl font-bold leading-tight">Script Story Adapter</h1>
+                    <p class="text-[#a8a8a4] mt-2 text-lg font-light">Custom timing for any story format.</p>
+                </div>
+                <div class="mt-6 md:mt-0 flex gap-4">
+                    <div class="bg-[#2b2a27] px-4 py-3 rounded text-center border border-[#3a3a38]">
+                        <span class="block text-2xl font-bold text-[#c7a982]" id="stat-total-time">15s</span>
+                        <span class="text-xs uppercase tracking-wider text-[#a8a8a4]">Target Time</span>
+                    </div>
+                    <div class="bg-[#2b2a27] px-4 py-3 rounded text-center border border-[#3a3a38]">
+                        <span class="block text-2xl font-bold text-[#c7a982]" id="stat-words">0</span>
+                        <span class="text-xs uppercase tracking-wider text-[#a8a8a4]">Total Words</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-5xl mx-auto px-6 py-12 grid grid-cols-1 gap-12">
+
+        <!-- SECTION 1: SMART INPUT & DURATION -->
+        <section class="w-full">
+            <div class="bg-white p-8 rounded-xl border border-[#e6e4df] shadow-sm">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-[#1a1a19]">Input Your Story</h2>
+                        <p class="text-slate-500 text-sm italic">The script will be automatically scaled to your selected duration.</p>
+                    </div>
+                    <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200" id="duration-selector">
+                        <button onclick="setDuration(15)" class="duration-pill active px-4 py-2 rounded-md text-xs font-bold border border-transparent" data-val="15">15s</button>
+                        <button onclick="setDuration(30)" class="duration-pill px-4 py-2 rounded-md text-xs font-bold border border-transparent" data-val="30">30s</button>
+                        <button onclick="setDuration(60)" class="duration-pill px-4 py-2 rounded-md text-xs font-bold border border-transparent" data-val="60">60s</button>
+                    </div>
+                </div>
+                
+                <textarea id="raw-story-input" class="w-full h-48 p-4 border border-[#e6e4df] rounded-xl input-focus mb-6 text-slate-700 leading-relaxed transition-colors" placeholder="Paste your full story here..."></textarea>
+                
+                <div class="flex flex-col md:flex-row gap-4">
+                    <button id="adapt-btn" onclick="adaptStory()" class="flex-1 py-4 bg-[#8b1c1c] text-white font-bold rounded-xl hover:bg-[#6b1616] transition-all shadow-lg shadow-red-900/10 active:scale-95 disabled:opacity-50">
+                        Generate & Time Script
+                    </button>
+                    <button onclick="clearInput()" class="px-6 py-4 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all">
+                        Clear
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: PACING ANALYSIS -->
+        <section class="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            <div class="bg-white p-6 rounded-xl border border-[#e6e4df] shadow-sm">
+                <h3 class="font-bold text-[#1a1a19] mb-4">Pacing Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="pacingChart"></canvas>
+                </div>
+                <p class="text-[10px] text-center text-[#8b8a86] mt-4" id="pacing-text">Pacing: Target ~2.6 words per second.</p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-[#f4eee6] p-4 rounded-lg border border-[#e6e4df]">
+                    <h4 class="font-bold text-xs text-[#8b1c1c] uppercase tracking-widest mb-2">Architect's Strategy</h4>
+                    <p class="text-xs text-slate-700 leading-relaxed" id="strategy-note">Select a duration and input a story to begin.</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg border border-[#e6e4df]">
+                    <h4 class="font-bold text-xs text-slate-500 uppercase tracking-widest mb-2">Timeline Segments</h4>
+                    <div class="space-y-3" id="timeline-indicator">
+                        <!-- Dynamic segment bars -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: GENERATED STORYBOARD -->
+        <section class="w-full" id="storyboard-section">
+            <h2 class="text-3xl font-bold text-[#1a1a19] mb-8">Generated Storyboard</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-white border border-[#e6e4df] rounded-xl overflow-hidden shadow-sm min-h-[450px]">
+                <div class="lg:col-span-4 bg-[#fcfbf9] border-r border-[#e6e4df] p-6 flex flex-col gap-4" id="scene-selector"></div>
+                <div class="lg:col-span-8 p-8 md:p-12 flex flex-col justify-center">
+                    <div id="scene-display" class="fade-in">
+                        <div class="text-center text-slate-300 italic">Generate a script to view the storyboard beats.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        let scriptData = [];
+        let currentSceneIndex = 0;
+        let chartInstance = null;
+        let targetDuration = 15;
+
+        const defaultStory = "Alexander the Great had never been slowed in battle. At the Persian Gates, 4,000 Persian soldiers held a mountain pass against his 400,000-man army for three days. Persian commander Ariobarzanes knew he was going to lose — but every day he held was a day the Persian royal family could escape east. He died in the pass. His king escaped. He never received a monument. History barely remembered his name.";
+
+        function setDuration(val) {
+            targetDuration = val;
+            document.querySelectorAll('.duration-pill').forEach(p => {
+                p.classList.remove('active');
+                if (parseInt(p.dataset.val) === val) p.classList.add('active');
+            });
+            document.getElementById('stat-total-time').innerText = val + 's';
+            renderTimelineIndicators();
+            if (document.getElementById('raw-story-input').value.trim() !== "") {
+                adaptStory();
+            }
+        }
+
+        function renderTimelineIndicators() {
+            const container = document.getElementById('timeline-indicator');
+            const segmentTime = targetDuration / 3;
+            container.innerHTML = `
+                <div class="flex justify-between text-[10px]"><span>The Hook (0-${segmentTime}s)</span><span class="font-bold">${segmentTime}s</span></div>
+                <div class="w-full bg-slate-100 h-1 rounded-full overflow-hidden"><div class="bg-amber-500 h-full" style="width: 33%"></div></div>
+                <div class="flex justify-between text-[10px]"><span>The Core (${segmentTime}-${segmentTime*2}s)</span><span class="font-bold">${segmentTime}s</span></div>
+                <div class="w-full bg-slate-100 h-1 rounded-full overflow-hidden"><div class="bg-red-500 h-full" style="width: 33%"></div></div>
+                <div class="flex justify-between text-[10px]"><span>The Impact (${segmentTime*2}-${targetDuration}s)</span><span class="font-bold">${segmentTime}s</span></div>
+                <div class="w-full bg-slate-100 h-1 rounded-full overflow-hidden"><div class="bg-slate-800 h-full" style="width: 34%"></div></div>
+            `;
+        }
+
+        function compress(str, limit) {
+            let words = str.split(/\s+/).filter(w => w.length > 0);
+            if (words.length <= limit) return str;
+            const condensed = words.slice(0, Math.floor(limit * 0.75)).concat(words.slice(-Math.floor(limit * 0.25)));
+            return condensed.join(' ') + (str.endsWith('.') ? '' : '.');
+        }
+
+        function generateVisualCue(text, type) {
+            const lower = text.toLowerCase();
+            if (lower.includes('battle') || lower.includes('army')) return `Cinematic ${type} shot of massive forces clashing in epic scale.`;
+            if (lower.includes('king') || lower.includes('commander')) return `Focused ${type} shot highlighting the character's emotional weight.`;
+            return `Dynamic ${type} shot establishing the atmosphere.`;
+        }
+
+        async function adaptStory() {
+            const btn = document.getElementById('adapt-btn');
+            const story = document.getElementById('raw-story-input').value.trim() || defaultStory;
+            
+            btn.disabled = true;
+            btn.innerText = "Recalibrating Time...";
+            await new Promise(r => setTimeout(r, 600));
+
+            // Logic: 2.6 words per second is a comfortable cinematic pace.
+            const totalWordsTarget = Math.floor(targetDuration * 2.6);
+            const segmentTarget = Math.floor(totalWordsTarget / 3);
+
+            const sentences = story.match(/[^\.!\?]+[\.!\?]+/g) || [story];
+            const partSize = Math.ceil(sentences.length / 3);
+            
+            const p1 = sentences.slice(0, partSize).join(' ');
+            const p2 = sentences.slice(partSize, partSize * 2).join(' ');
+            const p3 = sentences.slice(partSize * 2).join(' ');
+
+            const segTime = targetDuration / 3;
+
+            scriptData = [
+                { id: 1, time: `0s - ${segTime}s`, title: "The Hook", narration: compress(p1, segmentTarget), visual: generateVisualCue(p1, "wide") },
+                { id: 2, time: `${segTime}s - ${segTime*2}s`, title: "The Tension", narration: compress(p2, segmentTarget), visual: generateVisualCue(p2, "medium") },
+                { id: 3, time: `${segTime*2}s - ${targetDuration}s`, title: "The Resolution", narration: compress(p3, segmentTarget), visual: generateVisualCue(p3, "close") }
+            ];
+
+            document.getElementById('strategy-note').innerText = `Adapted for ${targetDuration}s duration. Word count optimized to ${totalWordsTarget} for a natural speaking pace.`;
+            document.getElementById('pacing-text').innerText = `Pacing: ~${segmentTarget} words per segment.`;
+
+            btn.disabled = false;
+            btn.innerText = "Generate & Time Script";
+
+            updateStats();
+            updateChart();
+            renderSceneList();
+            renderSceneDetail();
+        }
+
+        function updateStats() {
+            let total = scriptData.reduce((acc, s) => acc + s.narration.split(/\s+/).filter(w => w.length > 0).length, 0);
+            document.getElementById('stat-words').innerText = total;
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('pacingChart').getContext('2d');
+            const counts = scriptData.map(s => s.narration.split(/\s+/).length);
+            if (chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Beat 1', 'Beat 2', 'Beat 3'],
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: ['#8b1c1c', '#c7a982', '#2b2a27'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } } },
+                    cutout: '75%'
+                }
+            });
+        }
+
+        function renderSceneList() {
+            const container = document.getElementById('scene-selector');
+            container.innerHTML = '';
+            scriptData.forEach((scene, index) => {
+                const btn = document.createElement('button');
+                btn.className = `scene-card text-left p-4 rounded-xl border ${index === currentSceneIndex ? 'active border-[#e6e4df] shadow-sm' : 'border-transparent hover:bg-slate-100'}`;
+                btn.onclick = () => { currentSceneIndex = index; renderSceneList(); renderSceneDetail(); };
+                btn.innerHTML = `<div class="text-[10px] font-bold text-[#8b1c1c] mb-1 tracking-widest uppercase">${scene.time}</div><div class="font-bold text-sm text-[#1a1a19]">${scene.title}</div>`;
+                container.appendChild(btn);
+            });
+        }
+
+        function renderSceneDetail() {
+            const container = document.getElementById('scene-display');
+            const scene = scriptData[currentSceneIndex];
+            if (!scene) return;
+            container.classList.remove('fade-in');
+            void container.offsetWidth; 
+            container.classList.add('fade-in');
+            container.innerHTML = `
+                <div class="inline-block bg-[#1a1a19] text-white text-[10px] font-bold px-3 py-1 rounded uppercase tracking-widest mb-6">${scene.time}</div>
+                <h3 class="text-3xl font-bold text-[#1a1a19] mb-8 serif-text">${scene.title}</h3>
+                <div class="mb-10">
+                    <h4 class="text-xs font-bold text-[#8b8a86] uppercase tracking-widest mb-4">Narration</h4>
+                    <p class="text-2xl leading-relaxed text-[#2b2a27] border-l-4 border-[#c7a982] pl-8 py-2 serif-text italic">"${scene.narration}"</p>
+                </div>
+                <div class="pt-8 border-t border-[#e6e4df] flex flex-col md:flex-row gap-8">
+                    <div class="flex-1">
+                        <h4 class="text-xs font-bold text-[#8b8a86] uppercase tracking-widest mb-3">Visual Direction</h4>
+                        <p class="text-sm text-[#4a4946] leading-relaxed">${scene.visual}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function clearInput() {
+            document.getElementById('raw-story-input').value = '';
+            scriptData = [];
+            document.getElementById('scene-selector').innerHTML = '';
+            document.getElementById('scene-display').innerHTML = '<div class="text-center text-slate-300 italic">Generate a script to view the storyboard beats.</div>';
+            document.getElementById('stat-words').innerText = '0';
+            if (chartInstance) chartInstance.destroy();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTimelineIndicators();
+            document.getElementById('raw-story-input').value = defaultStory;
+            adaptStory();
+        });
+    </script>
+</body>
+</html>
